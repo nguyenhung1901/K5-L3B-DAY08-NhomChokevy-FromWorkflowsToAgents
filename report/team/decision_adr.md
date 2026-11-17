@@ -1,6 +1,6 @@
 # Biên bản quyết định kiến trúc (Architecture Decision Record)
 
-> Tài liệu này dùng mẫu ADR của Lab 8. Giữ nguyên tên các trường bên dưới để `lab8.check_submission` nhận diện được. Trước khi nộp bài, thay phần chờ điền commit bằng mã commit thật trên GitHub.
+
 
 - Shape chọn: workflow
 - Commit hash: [CHƯA ĐIỀN: chạy `git rev-parse --short HEAD` sau khi commit phần kỹ thuật và điền mã thật]
