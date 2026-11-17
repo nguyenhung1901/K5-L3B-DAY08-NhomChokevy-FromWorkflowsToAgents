@@ -56,7 +56,25 @@ Dữ liệu dưới đây trích từ `src/reports/benchmark.json` được cung
 
 Workflow, Single Agent và Orchestrator đều đúng **70/70 trials**. Swarm đúng **69/70 trials**, sai ở `C-002` với seed `55`: kết quả thực tế `resolved`, trong khi nhãn mong đợi là `denied` (`R-swarm-C-002-s55`). Đây là lỗi trạng thái theo evaluator; chưa đủ cơ sở khẳng định đã phát sinh một giao dịch hoàn tiền sai.
 
-**Quyết định:** Nhóm ưu tiên **Workflow** cho bài toán hiện tại, vì cùng đạt 100% như Single Agent và Orchestrator nhưng chi phí mô phỏng thấp nhất, trung bình ít bước hơn Orchestrator. Việc bổ sung nhiều Agent chưa cho thấy lợi ích về tỷ lệ đúng trong bộ public. Lập luận chi tiết nằm trong [`decision_adr.md`](decision_adr.md); phiếu nghiên cứu R3 và phần so sánh kiến trúc nằm trong [`research_card.md`](research_card.md). Chưa có bằng chứng về kết quả `student_drop/`, nên nhóm không đưa ra khẳng định về hidden evaluation.
+**Quyết định:** Nhóm ưu tiên **Workflow** cho bài toán hiện tại, vì cùng đạt 100% như Single Agent và Orchestrator nhưng chi phí mô phỏng thấp nhất, trung bình ít bước hơn Orchestrator. Việc bổ sung nhiều Agent chưa cho thấy lợi ích về tỷ lệ đúng trong bộ public. Lập luận chi tiết nằm trong [`decision_adr.md`](decision_adr.md); phiếu nghiên cứu R3 và phần so sánh kiến trúc nằm trong [`research_card.md`](research_card.md). Nhóm đã chạy thêm phần tự kiểm tra `student_drop/` không nhãn (mục 4.3), nhưng vẫn chưa có căn cứ kết luận tỷ lệ đúng trên hidden grader chính thức.
+
+
+### 4.3. Tự kiểm tra với student_drop không có nhãn
+
+Nhóm chạy `lab8.benchmark` trên `student_drop/hidden_claims.jsonl` và `student_drop/hidden_world_state.json`, sử dụng 40 claims và 5 seeds (`11, 22, 33, 44, 55`). File kết quả được lưu cục bộ tại `src/reports/hidden_selfcheck.json`. Tổng cộng có **600 lượt chạy**, tương ứng **200 lượt cho mỗi Shape A, B và C**. Bộ này không có nhãn đáp án nên `graded_trials = 0`, `pass_rate = null` và `pass_5 = null`; không thể tuyên bố 600 lượt đều đúng.
+
+| Chỉ số | Workflow | Single Agent | Orchestrator |
+| :--- | ---: | ---: | ---: |
+| Lượt chạy | 200 | 200 | 200 |
+| Lỗi thực thi (`error_trials`) | 0 | 0 | 0 |
+| Nghi ngờ rò dữ liệu (`leak_suspect_trials`) | 0 | 0 | 0 |
+| Bước trung bình / p95 | 1,925 / 2 | 1,925 / 2 | 2,900 / 3 |
+| Lượt gọi tool trung bình | 3,525 | 3,525 | 5,475 |
+| Lượt gọi model trung bình | 0 | 3,900 | 0 |
+| Tổng chi phí mô phỏng (VND) | 7.050,00 | 7.392,60 | 10.950,00 |
+
+Ba Shape có cùng phân bố kết quả trạng thái trên 200 lượt của mỗi Shape: `denied` 95, `resolved` 90, `needs_info` 5 và `escalated` 10. Đối chiếu theo từng cặp claim và seed cho thấy **không có trường hợp khác biệt trạng thái giữa ba Shape**. Đây là bằng chứng về tính nhất quán của kết quả đầu ra trong bộ tự kiểm, chứ không phải bằng chứng kết quả đó đúng so với đáp án của giảng viên. Chỉ số nghi ngờ rò dữ liệu bằng 0 cũng không thay thế được kiểm toán bảo mật độc lập.
+
 
 ## 5. Khó khăn và cách xử lý
 
@@ -76,10 +94,12 @@ Chi tiết thành viên, vai trò, commit và test được quản lý trong [`T
 
 Benchmark dùng MockLLM, giá VND mô phỏng và 14 claim công khai nên chưa phản ánh điều kiện sản xuất. Trường latency là `unavailable`; không thể kết luận về tốc độ phản hồi thực tế. Kết quả 309 tests chỉ chứng minh các kiểm tra đã được chạy tại thời điểm đó, không thay thế đánh giá ẩn hay kiểm toán bảo mật độc lập. Ngoài ra, khi thay đổi kiến trúc, số lần gọi công cụ và luồng xử lý cũng thay đổi nên chưa thể quy mọi chênh lệch chỉ cho số lượng Agent.
 
-Để cải thiện, nhóm cần thử dữ liệu đa dạng hơn, đo latency và chi phí thật, kiểm tra các trường hợp ticket chứa thông tin đánh lừa hoặc chính sách thay đổi, rà soát trace/stdout và đối chiếu toàn bộ kết quả với hidden selfcheck nếu được phát. Nhóm sẽ cân nhắc kiến trúc phức tạp hơn khi nó chứng minh lợi ích rõ ràng về chất lượng, khả năng xử lý hoặc vận hành mà vẫn giữ các ranh giới an toàn.
+Để cải thiện, nhóm cần thử dữ liệu đa dạng hơn, đo latency và chi phí thật, kiểm tra các trường hợp ticket chứa thông tin đánh lừa hoặc chính sách thay đổi, rà soát trace/stdout và mở rộng kiểm thử theo những rủi ro chưa được bộ self-check không nhãn đánh giá. Dữ liệu `student_drop/` đã được chạy, nhưng nhóm vẫn cần kết quả chấm có nhãn từ giảng viên để xác nhận tỷ lệ đúng. Nhóm sẽ cân nhắc kiến trúc phức tạp hơn khi nó chứng minh lợi ích rõ ràng về chất lượng, khả năng xử lý hoặc vận hành mà vẫn giữ các ranh giới an toàn.
 
 ## 8. Tài liệu tham khảo
 
 1. [Kiến trúc Lab 8](../../docs/architecture.md), [hợp đồng kết quả và trace](../../docs/contracts.md), [quy tắc thực hành](../../RULES.md) và [hướng dẫn nộp bài](../../SUBMISSION.md).
-2. Kết quả tự sinh: `src/reports/benchmark.json` và `src/reports/crash.json`.
+2. Kết quả tự sinh: `src/reports/benchmark.json`, `src/reports/crash.json` và file tự kiểm cục bộ `src/reports/hidden_selfcheck.json` (không nhãn, không dùng để chứng minh pass rate).
 3. [AgentArch: A Benchmark for Evaluating Agent Architectures in Enterprise Workflows, AACL 2026](https://aclanthology.org/2026.aacl-long.44/), nguồn tham khảo cho phiếu nghiên cứu R3.
+
+**Trước khi nộp:** Nhóm xác nhận commit chốt trên `main` rồi cập nhật cùng mã đó ở báo cáo này và `decision_adr.md`; kiểm tra lại số liệu nếu benchmark được chạy lại trong repository nhóm.

@@ -52,8 +52,11 @@ Commit chính của mình là **`a6dc301`** với nội dung `Implement orchestr
 | Toàn bộ test trong repository nhóm | `python -m pytest -q -m "student or not student" -o addopts=` cho kết quả **309 passed** trong lần chạy mình đã kiểm tra |
 | File code | `src/lab8/shapes/orchestrator.py` |
 | File test do mình thêm | `src/tests/test_orchestrator_handoff.py` |
+| Hidden self-check không nhãn | `src/reports/hidden_selfcheck.json`: Orchestrator chạy 200 lượt, 0 lỗi thực thi, 0 lượt nghi ngờ rò secret; trung bình 2,90 bước và 5,475 lượt gọi tool |
 
 Kết quả 309 tests là kết quả tại thời điểm kiểm tra trên máy mình. Đây là các test có trong repository nhóm, chưa phải xác nhận đã vượt bộ hidden tests của giảng viên.
+
+Mình cũng chạy self-check trên `student_drop/` gồm 40 claims và 5 seeds. Riêng Shape C có 200 lượt chạy, trả về 95 trạng thái `denied`, 90 `resolved`, 5 `needs_info` và 10 `escalated`. Phần kiểm tra này ghi `graded_trials = 0`, `pass_rate = null` vì không có nhãn đáp án. Vì vậy mình chỉ ghi nhận việc chạy ổn định và không có cảnh báo rò dữ liệu trong phạm vi công cụ, chứ không báo cáo tỷ lệ chính xác cho hidden tests.
 
 ## 5. Công cụ AI đã dùng
 
@@ -69,4 +72,4 @@ Qua phần việc này, mình hiểu rõ hơn cách Orchestrator giao việc cho
 
 Mình đã hoàn thành phần Orchestrator và Handoff được phân công, bổ sung ba test riêng, chạy kiểm thử thành công và push commit lên nhánh cá nhân. Điểm mình cần cải thiện là khả năng tự triển khai và giải thích chi tiết toàn bộ luồng xử lý mà không cần trợ lý AI hỗ trợ, đặc biệt là các trường hợp retry, crash và kiểm tra quyền ở host.
 
-Mình chưa xem kết quả hidden tests và chưa coi 309 test công khai đạt yêu cầu là bằng chứng hệ thống đã an toàn trong mọi trường hợp. Nếu có thêm thời gian, mình muốn bổ sung test tích hợp xác nhận investigator thực sự không thể gọi công cụ ghi khi Orchestrator đang chạy.
+Mình đã chạy self-check không nhãn trên `student_drop/` nhưng chưa biết kết quả chấm hidden chính thức. Mình không coi 309 test đã đạt và 200 lượt self-check của Shape C là bằng chứng hệ thống an toàn hoặc chính xác trong mọi trường hợp. Nếu có thêm thời gian, mình muốn bổ sung test tích hợp xác nhận investigator thực sự không thể gọi công cụ ghi khi Orchestrator đang chạy.
