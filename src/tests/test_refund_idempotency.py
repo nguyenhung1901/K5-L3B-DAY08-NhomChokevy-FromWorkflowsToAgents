@@ -1,6 +1,7 @@
 from lab8.db import connect
 from lab8.durability import InjectedCrash, committed_audit_count, get_refund, issue_refund
-
+import pytest
+from lab8.shapes import SHAPES
 
 def test_retry_same_amount_is_one_row(public_db):
     conn = connect(public_db)
@@ -53,3 +54,45 @@ def committed_audit_count_safe(store) -> int:
         return committed_audit_count(conn, "C-011")
     finally:
         conn.close()
+
+
+
+@pytest.mark.parametrize(
+    "first_shape, second_shape",
+    [
+        ("workflow", "single"),
+        ("single", "orchestrator"),
+        ("orchestrator", "workflow"),
+    ],
+)
+def test_cross_shape_retry_keeps_one_refund(
+    public_db, first_shape, second_shape
+):
+    store_path = str(public_db)
+
+    first = SHAPES[first_shape](
+        "C-001", seed=11, store_path=store_path
+    )
+    second = SHAPES[second_shape](
+        "C-001", seed=22, store_path=store_path
+    )
+
+    conn = connect(public_db)
+    try:
+        count = conn.execute(
+            """
+            SELECT COUNT(*) AS n
+            FROM refund_ledger
+            WHERE claim_id = ?
+            """,
+            ("C-001",),
+        ).fetchone()["n"]
+
+        audits = committed_audit_count(conn, "C-001")
+    finally:
+        conn.close()
+
+    assert first.status == "resolved"
+    assert second.status == "resolved"
+    assert count == 1
+    assert audits == 1
