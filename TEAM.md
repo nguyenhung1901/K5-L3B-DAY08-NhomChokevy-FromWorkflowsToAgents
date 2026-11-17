@@ -2,7 +2,7 @@
 
 ## Thông tin nhóm
 
-- Tên nhóm:
+- Tên nhóm: NhomChokevy
 - Lớp: L3B
 - Repo nhóm: `K5-L3B-DAY08-NhomChokeVy-FromWorkflowsToAgents` (xem [SUBMISSION.md](SUBMISSION.md))
 - URL repo, nhánh nộp, commit chốt:
@@ -13,7 +13,7 @@
 | --: | ------ | ---- | ----- | ------ | ------- |
 |   1 | Phạm Lê Chuẩn | 2A202603784 | lechuanpham@gmail.com | 22520160 | workflow + integration |
 |   2 | Nguyễn Tài Minh Huy | 2A202603828 | nguyentaiminhhuy831975@gmail.com | ArthurTheMana | orchestrator + handoff + student_drop |
-
+|   3 | Nguyễn Văn Hùng | 2A202603816 |  | `nguyenhung1901` | ledger + evaluation |
 Gợi ý chia vai:
 
 - Nhóm 6 người: integration; workflow; single agent; orchestrator; ledger/policy/crash; eval/report.
@@ -27,6 +27,7 @@ Gợi ý chia vai:
 | --- | --- | --- | --- |
 | Phạm Lê Chuẩn | workflow + integration | Chưa commit (working tree) | `src/tests/test_workflow_integration.py` (3 passed); student workflow matrix (62 passed) |
 | Nguyễn Tài Minh Huy | Orchestrator + Handoff | `648fb4e` + `5457779` + `a6dc301` + `ed40d2c` | `src/tests/test_orchestrator_handoff.py` (3 passed); toàn bộ repository (309 passed); Student Drop (200 lượt Orchestrator, 0 lỗi thực thi, 0 nghi ngờ rò rỉ dữ liệu) |
+| Nguyễn Văn Hùng | ledger + evaluation | `ecfd50c` | `src/tests/test_refund_idempotency.py::test_cross_shape_retry_keeps_one_refund` (3 tham số) |
 
 ## Cá nhân
 
@@ -119,3 +120,27 @@ File kết quả: `src/reports/hidden_selfcheck.json` trên máy kiểm thử.
 **5. Báo cáo cá nhân**
 
 `report/team/2A202603828_NguyenTaiMinhHuy.md`
+
+## 2A202603816_NguyenVanHung
+
+### Phần việc phụ trách
+
+Phụ trách Ledger + Evaluation: kiểm thử tính idempotency của quá trình hoàn tiền, đánh giá khả năng phục hồi sau crash và thực hiện benchmark so sánh bốn kiến trúc Workflow, Single Agent, Orchestrator và Swarm.
+
+### Đóng góp cụ thể
+
+- Bổ sung kiểm thử test_cross_shape_retry_keeps_one_refund gồm 3 trường hợp xử lý lại yêu cầu hoàn tiền giữa các kiến trúc khác nhau, xác minh không tạo bản ghi refund và audit trùng trên cùng SQLite ledger.
+
+- Thực hiện benchmark trên 14 claim công khai với 5 seed; chạy 20 kịch bản crash safety và tạo hai file kết quả benchmark.json, crash.json.
+
+- Tổng hợp và phân tích các chỉ số pass rate, pass⁵, seed variance và cost/success để hỗ trợ nhóm lựa chọn kiến trúc Workflow và hoàn thiện Research Card R3.
+
+### Bằng chứng
+
+- Commit kiểm thử: ecfd50c.
+
+- Kiểm thử: src/tests/test_refund_idempotency.py đạt 6/6, gồm 3 trường hợp mới; toàn bộ dự án đạt 312/312 tests tại lần kiểm tra gần nhất.
+
+- Benchmark: src/reports/benchmark.json, Workflow đạt 100% với chi phí mô phỏng 34,29 VND/lượt xử lý đúng.
+
+- Crash safety: src/reports/crash.json, đạt 20/20 kịch bản.
