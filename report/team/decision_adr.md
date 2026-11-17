@@ -3,7 +3,7 @@
 
 
 - Shape chọn: workflow
-- Commit hash: [CHƯA ĐIỀN: chạy `git rev-parse --short HEAD` sau khi commit phần kỹ thuật và điền mã thật]
+- Commit hash: 8de53cb
 - Run id dẫn chứng: R-workflow-C-001-s11 (một lần chạy trong benchmark công khai, xem `src/reports/benchmark.json`)
 - Pass rate / pass^5 / seed min-max / variance: 100,00% (70/70) / 100,00% / 100,00%–100,00% / 0,000000 (các seed: 11, 22, 33, 44, 55)
 - Cost per success (mô phỏng, VND): 34,29 VND cho mỗi lần xử lý đúng; tổng chi phí mô phỏng 2.400,00 VND cho 70 lần chạy Workflow (`src/reports/benchmark.json`)
